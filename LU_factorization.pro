@@ -18,6 +18,6 @@ SOURCES += main.cpp\
 HEADERS  += lu_main_window.h \
     Matrix.hpp \
     NumericMatrix.hpp \
-    Squarematrix.h
+    Squarematrix.hpp
 
 FORMS    += lu_main_window.ui

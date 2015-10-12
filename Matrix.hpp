@@ -26,6 +26,8 @@ public:
 
     virtual T get(const int i, const int j) const;
     virtual bool set(const int i, const int j, const T value);
+    virtual const unsigned int getRowsCount();
+    virtual const unsigned int getColumnsCount();
 };
 
 template <typename T>
@@ -45,6 +47,18 @@ bool Matrix<T>::set(const int i, const int j, const T value)
         return true;
     } else
         throw INVALID_RANGE;
+}
+
+template <typename T>
+const unsigned int Matrix<T>::getRowsCount()
+{
+    return _nrows;
+}
+
+template <typename T>
+const unsigned int Matrix<T>::getColumnsCount()
+{
+    return _ncols;
 }
 
 #endif // MATRIX_H
