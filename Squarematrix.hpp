@@ -1,6 +1,7 @@
 #ifndef SQUAREMATRIX
 #define SQUAREMATRIX
 
+#include <cmath>
 #include "NumericMatrix.hpp"
 
 template <typename T>

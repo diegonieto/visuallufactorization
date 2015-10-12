@@ -23,6 +23,11 @@
       <height>440</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
     <attribute name="horizontalHeaderDefaultSectionSize">
      <number>50</number>
     </attribute>
@@ -69,6 +74,19 @@
     </property>
     <property name="text">
      <string>Size:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonFill">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>380</y>
+      <width>99</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Fill matrix</string>
     </property>
    </widget>
   </widget>

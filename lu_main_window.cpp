@@ -1,6 +1,7 @@
 #include "lu_main_window.h"
 #include "ui_lu_main_window.h"
 #include "Squarematrix.hpp"
+#include <sstream>
 
 LU_main_window::LU_main_window(QWidget *parent) :
     QMainWindow(parent),
@@ -58,9 +59,9 @@ bool LU_main_window::readMatrix(QTableWidget &table, SquareMatrix<NumericType> &
 
     // Read values from widgets
     NumericType tmp;
-    for ( unsigned int i=0; i<_matrix->getSize(); i++ )
+    for ( unsigned int i=0; i<table.rowCount(); i++ )
     {
-        for ( unsigned int j=0; j<_matrix->getSize(); j++ )
+        for ( unsigned int j=0; j<table.columnCount(); j++ )
         {
             try {
                 if ( table.item(i,j) != NULL ) {
@@ -69,7 +70,7 @@ bool LU_main_window::readMatrix(QTableWidget &table, SquareMatrix<NumericType> &
                 } else
                     throw -20;
             } catch (int) {
-                ui->statusBar->showMessage("Please, initialize the matrices");
+                ui->statusBar->showMessage("Please, initialize the matrix");
                 return false;
             }
         }
@@ -81,5 +82,54 @@ bool LU_main_window::readMatrix(QTableWidget &table, SquareMatrix<NumericType> &
 
 void LU_main_window::on_pushButtonFactorize_clicked()
 {
-    readMatrix(*(ui->tableWidgetMatrix), *_matrix);
+    if (readMatrix(*(ui->tableWidgetMatrix), *_matrix) ) {
+        // Factorize
+        _matrix->lu();
+        ui->statusBar->showMessage("Matrix factorized");
+
+        updateQTableWidgetFromMatrix(*(ui->tableWidgetMatrix), *_matrix);
+    }
+}
+
+void LU_main_window::fillMatrix(QTableWidget *qtableWidget)
+{
+    unsigned int nrows = qtableWidget->rowCount();
+    unsigned int ncols = qtableWidget->columnCount();
+
+    std::ostringstream buffer;
+    int totalValue;
+
+    for ( unsigned int i=0; i<nrows; i++ )
+    {
+        for ( unsigned int j=0; j<ncols; j++ )
+        {
+            QTableWidgetItem *newItem = new QTableWidgetItem();
+            totalValue = 1+(i*ncols+j);
+            std::ostringstream buffer;
+            buffer << totalValue;
+            newItem->setText(buffer.str().c_str());
+            qtableWidget->setItem(i, j, newItem);
+        }
+    }
+}
+
+void LU_main_window::updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<NumericType> &matrix)
+{
+    for ( unsigned int i=0; i<qTableWidget.rowCount(); i++ )
+    {
+        for ( unsigned int j=0; j<qTableWidget.columnCount(); j++ )
+        {
+            // Update C values
+            std::ostringstream buffer;
+            buffer << matrix.get(i, j);
+            QTableWidgetItem *newItem = new QTableWidgetItem();
+            newItem->setText(buffer.str().c_str());
+            qTableWidget.setItem(i, j, newItem);
+        }
+    }
+}
+
+void LU_main_window::on_pushButtonFill_clicked()
+{
+    fillMatrix(ui->tableWidgetMatrix);
 }

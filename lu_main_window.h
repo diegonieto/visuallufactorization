@@ -25,12 +25,15 @@ public:
     void restart();
     void changeSize(const unsigned int size);
     bool readMatrix(QTableWidget &table, SquareMatrix<NumericType> &matrix);
-
+    void updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<NumericType> &matrix);
+    void fillMatrix(QTableWidget *qtableWidget);
 
 private slots:
     void on_spinSize_valueChanged(const QString &arg1);
 
     void on_pushButtonFactorize_clicked();
+
+    void on_pushButtonFill_clicked();
 
 private:
     Ui::LU_main_window *ui;
