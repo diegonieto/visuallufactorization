@@ -8,6 +8,7 @@ LU_main_window::LU_main_window(QWidget *parent) :
     ui(new Ui::LU_main_window)
 {
     ui->setupUi(this);
+    setWindowTitle("Visual LU factorization");
     initialize();
 }
 
