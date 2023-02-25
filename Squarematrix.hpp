@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "NumericMatrix.hpp"
+#include <array>
 
 template <typename T>
 class SquareMatrix : public NumericMatrix<T> {
@@ -43,24 +44,34 @@ void SquareMatrix<T>::permute(const unsigned int startRow)
 template <typename T>
 void SquareMatrix<T>::lu()
 {
-    // Iterate through each column
-    for ( unsigned int col=0; col<this->getColumnsCount()-1; col++ )
-    {
-        permute(col);
-        // Iterate through each row to do zero
-        for ( unsigned int row=col+1; row<this->getRowsCount(); row++ )
-        {
-            // Compute the pivot
-            T p = static_cast<T>(-static_cast<T>(this->get(row, col))/static_cast<T>(this->get(col, col)));
-            // Update row
-            for ( unsigned int k=col; k<this->getColumnsCount(); k++ )
-            {
-                this->set(row, k, this->get(row, k)+p*this->get(col, k));
-            }
-            // Store the pivot for L
-            this->set(row, col, -p);
-        }
-    }
+  std::vector<T> L;
+  L.reserve(this->getColumnsCount()*this->getRowsCount());
+  // Iterate through each column
+  for ( unsigned int col=0; col<this->getColumnsCount()-1; col++ )
+  {
+      permute(col);
+      // Iterate through each row to do zero
+      for ( unsigned int row=col+1; row<this->getRowsCount(); row++ )
+      {
+          // Compute the pivot
+          T p = static_cast<T>(-static_cast<T>(this->get(row, col))/static_cast<T>(this->get(col, col)));
+          // Update row
+          for ( unsigned int k=col; k<this->getColumnsCount(); k++ )
+          {
+              this->set(row, k, this->get(row, k)+p*this->get(col, k));
+          }
+          // Store the pivot for L
+          L[row*this->getColumnsCount()+col] = -p;
+      }
+  }
+  for (unsigned int row = 1; row < this->getRowsCount(); row++)
+  {
+      // Update row
+      for (unsigned int col = 0; col < row; col++)
+      {
+          this->set(row, col, L[row*this->getColumnsCount()+col]);
+      }
+  }
 }
 
 #endif // SQUAREMATRIX
