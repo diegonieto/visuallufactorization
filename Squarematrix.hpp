@@ -75,4 +75,3 @@ void SquareMatrix<T>::lu()
 }
 
 #endif // SQUAREMATRIX
-
