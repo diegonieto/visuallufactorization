@@ -1,6 +1,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include <iostream>
+
 enum Matrix_Errors {
     INVALID_RANGE = -20
 };
@@ -9,8 +11,8 @@ template <typename T>
 class Matrix
 {
 protected:
-    const int _nrows;
-    const int _ncols;
+    const unsigned int _nrows;
+    const unsigned int _ncols;
     T *_matrix;
 public:
     Matrix(const int nrows, const int ncols) :
@@ -24,14 +26,15 @@ public:
         delete[] _matrix;
     }
 
-    virtual T get(const int i, const int j) const;
-    virtual bool set(const int i, const int j, const T value);
+    virtual T get(const unsigned int i, const unsigned int j) const;
+    virtual bool set(const unsigned int i, const unsigned int j, const T value);
     virtual const unsigned int getRowsCount();
     virtual const unsigned int getColumnsCount();
+    void print();
 };
 
 template <typename T>
-T Matrix<T>::get(const int i, const int j) const
+T Matrix<T>::get(const unsigned int i, const unsigned int j) const
 {
     if ( i <_nrows && j < _ncols )
         return _matrix[i*_ncols+j];
@@ -40,7 +43,7 @@ T Matrix<T>::get(const int i, const int j) const
 }
 
 template <typename T>
-bool Matrix<T>::set(const int i, const int j, const T value)
+bool Matrix<T>::set(const unsigned int i, const unsigned int j, const T value)
 {
     if ( i <_nrows && j < _ncols ) {
         _matrix[i*_ncols+j] = value;
@@ -59,6 +62,19 @@ template <typename T>
 const unsigned int Matrix<T>::getColumnsCount()
 {
     return _ncols;
+}
+
+template <typename T>
+void Matrix<T>::print()
+{
+    for (unsigned int i = 0; i < _nrows; i++)
+    {
+        for (unsigned int j = 0; j < _ncols; j++)
+        {
+            std::cout << _matrix[i*_ncols+j] << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 #endif // MATRIX_H

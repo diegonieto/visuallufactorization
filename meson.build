@@ -27,3 +27,7 @@ executable(
     qtprocessed,
     dependencies : qt5_dep,
 )
+
+if (get_option('tests'))
+    subdir('test')
+endif

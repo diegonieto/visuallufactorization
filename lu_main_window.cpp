@@ -60,9 +60,9 @@ bool LU_main_window::readMatrix(QTableWidget &table, SquareMatrix<NumericType> &
 
     // Read values from widgets
     NumericType tmp;
-    for ( unsigned int i=0; i<table.rowCount(); i++ )
+    for ( unsigned int i=0; i<static_cast<unsigned int>(table.rowCount()); i++ )
     {
-        for ( unsigned int j=0; j<table.columnCount(); j++ )
+        for ( unsigned int j=0; j<static_cast<unsigned int>(table.columnCount()); j++ )
         {
             try {
                 if ( table.item(i,j) != NULL ) {
@@ -116,9 +116,9 @@ void LU_main_window::fillMatrix(QTableWidget *qtableWidget)
 
 void LU_main_window::updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<NumericType> &matrix)
 {
-    for ( unsigned int i=0; i<qTableWidget.rowCount(); i++ )
+    for ( unsigned int i=0; i<static_cast<unsigned int>(qTableWidget.rowCount()); i++ )
     {
-        for ( unsigned int j=0; j<qTableWidget.columnCount(); j++ )
+        for ( unsigned int j=0; j<static_cast<unsigned int>(qTableWidget.columnCount()); j++ )
         {
             // Update C values
             std::ostringstream buffer;
