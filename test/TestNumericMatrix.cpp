@@ -58,6 +58,68 @@ TEST(NumericMatrix, checkInit)
   }
 }
 
+TEST(NumericMatrix, LU1)
+{
+  const size_t matrixSize = 3;
+  std::unique_ptr<SquareMatrix<NumericType>> matrix = std::make_unique<SquareMatrix<NumericType>>(matrixSize);
+  matrix->set(0, 0, 1);
+  matrix->set(0, 1, 2);
+  matrix->set(0, 2, 2);
+  matrix->set(1, 0, 4);
+  matrix->set(1, 1, 4);
+  matrix->set(1, 2, 2);
+  matrix->set(2, 0, 4);
+  matrix->set(2, 1, 6);
+  matrix->set(2, 2, 4);
+
+  matrix->print();
+
+  matrix->lu();
+
+  matrix->print();
+
+  EXPECT_NEAR(4, matrix->get(0, 0), 0.00001);
+  EXPECT_NEAR(4, matrix->get(0, 1), 0.00001);
+  EXPECT_NEAR(2, matrix->get(0, 2), 0.00001);
+  EXPECT_NEAR(1, matrix->get(1, 0), 0.00001);
+  EXPECT_NEAR(2, matrix->get(1, 1), 0.00001);
+  EXPECT_NEAR(2, matrix->get(1, 2), 0.00001);
+  EXPECT_NEAR(0.25, matrix->get(2, 0), 0.00001);
+  EXPECT_NEAR(0.5, matrix->get(2, 1), 0.00001);
+  EXPECT_NEAR(0.5, matrix->get(2, 2), 0.00001);
+}
+
+TEST(NumericMatrix, LU2)
+{
+  const size_t matrixSize = 3;
+  std::unique_ptr<SquareMatrix<NumericType>> matrix = std::make_unique<SquareMatrix<NumericType>>(matrixSize);
+  matrix->set(0, 0, 25);
+  matrix->set(0, 1, 5);
+  matrix->set(0, 2, 1);
+  matrix->set(1, 0, 64);
+  matrix->set(1, 1, 8);
+  matrix->set(1, 2, 1);
+  matrix->set(2, 0, 144);
+  matrix->set(2, 1, 12);
+  matrix->set(2, 2, 1);
+
+  matrix->print();
+
+  matrix->lu();
+
+  matrix->print();
+
+  EXPECT_NEAR(144, matrix->get(0, 0), 0.00001);
+  EXPECT_NEAR(12, matrix->get(0, 1), 0.00001);
+  EXPECT_NEAR(1, matrix->get(0, 2), 0.00001);
+  EXPECT_NEAR(0.17361, matrix->get(1, 0), 0.00001);
+  EXPECT_NEAR(2.91667, matrix->get(1, 1), 0.00001);
+  EXPECT_NEAR(0.82639, matrix->get(1, 2), 0.00001);
+  EXPECT_NEAR(0.44444, matrix->get(2, 0), 0.00001);
+  EXPECT_NEAR(0.91429, matrix->get(2, 1), 0.00001);
+  EXPECT_NEAR(-0.2, matrix->get(2, 2), 0.00001);
+}
+
 int main(int argc, char *argv[])
 {
   ::testing::InitGoogleTest(&argc, argv);

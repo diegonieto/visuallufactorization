@@ -71,10 +71,11 @@ void Matrix<T>::print()
     {
         for (unsigned int j = 0; j < _ncols; j++)
         {
-            std::cout << _matrix[i*_ncols+j] << " ";
+            std::cout << _matrix[i*_ncols+j] << "\t";
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
 
 #endif // MATRIX_H
