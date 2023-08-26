@@ -71,7 +71,7 @@ void Matrix<T>::print()
     {
         for (unsigned int j = 0; j < _ncols; j++)
         {
-            std::cout << _matrix[i*_ncols+j] << "\t";
+            std::cout << std::setprecision(4) << _matrix[i*_ncols+j] << "\t\t\t";
         }
         std::cout << std::endl;
     }

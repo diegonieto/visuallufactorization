@@ -5,6 +5,15 @@
 #include "NumericMatrix.hpp"
 #include <array>
 
+// #define DEBUG
+#ifdef DEBUG
+#define DBG(x) std::cout << __PRETTY_FUNCTION__ << ":" << __LINE__ << x << std::endl;
+#define DBG_CMD(x) x
+#else
+#define DBG(x)
+#define DBG_CMD(x)
+#endif
+
 template <typename T>
 class SquareMatrix : public NumericMatrix<T> {
 public:
@@ -17,6 +26,20 @@ public:
      */
     void lu();
 
+    /**
+     * @brief Get the inverse of the given matrix
+     *
+     */
+    SquareMatrix<T> getInverse();
+
+    /**
+     * @brief Set data from a memory pointer
+     *
+     * @param ptr pointer to data
+     * @param size size of the date. Must much cols*rows, i.e., size
+     */
+    void setData(T ptr, size_t size);
+
 private:
     /**
      * @brief Given a startRow, it iterates forward looking for the max
@@ -24,6 +47,11 @@ private:
      *
      */
     void permute(const unsigned int startRow);
+
+    /**
+     * @brief Make the matrix identity by setting ones in the diagonal
+     */
+    void makeIdentity();
 };
 
 template <typename T>
@@ -53,6 +81,19 @@ void SquareMatrix<T>::permute(const unsigned int startRow)
   }
 }
 
+/**
+ * @brief Make the matrix identity by setting ones in the diagonal
+ */
+template<typename T>
+void SquareMatrix<T>::makeIdentity()
+{
+  this->setZero();
+  for (unsigned rowcol = 0; rowcol < this->getSize(); rowcol++ )
+  {
+    this->set(rowcol, rowcol, static_cast<T>(1.0f));
+  }
+}
+
 template <typename T>
 void SquareMatrix<T>::lu()
 {
@@ -74,6 +115,117 @@ void SquareMatrix<T>::lu()
           this->set(row, col, -p);
       }
   }
+}
+
+template <typename T>
+SquareMatrix<T> SquareMatrix<T>::getInverse()
+{
+  DBG (" printing original LU: ");
+  DBG_CMD (this->print());
+
+  // Perform backward substitution. U will do the following transformation:
+  SquareMatrix<T> Uinverse(getSize());
+  Uinverse.makeIdentity();
+  //   U   |  UInv
+  // u u u | 1 0 0      1 0 0 | u-1 u-1 u-1
+  // 0 u u | 0 1 0  ->  0 1 0 |  0  u-1 u-1
+  // 0 0 u | 0 0 1      0 0 1 |  0   0  u-1
+  for ( int row = getSize()-1; row >= 0; row-- )
+  {
+    T p = static_cast<T>(static_cast<T>(1.0f)/this->get(row, row));
+    // Multiply all the row by the pivot in both matrix
+    for ( unsigned int col = row; col < this->getSize(); col++ )
+    {
+      this->set(row, col, this->get(row, col)*p);
+      Uinverse.set(row, col, Uinverse.get(row, col)*p);
+    }
+    DBG (" row is " << row);
+    // Make zeros the colum of the row-1 to row=0
+    for ( int rowInUpdate = row-1; rowInUpdate >= 0; rowInUpdate-- )
+    {
+        DBG (" in update " << rowInUpdate );
+        const T localPivot = -this->get(rowInUpdate, row);
+        // Update all the columns at the right of the(rowInUpdate, row) in both matrix
+        for ( unsigned int kcol=row; kcol<getSize(); kcol++)
+        {
+          this->set(rowInUpdate, kcol, localPivot*this->get(row, kcol)+this->get(rowInUpdate, kcol));
+          const auto updatedValue = localPivot*Uinverse.get(row, kcol)+Uinverse.get(rowInUpdate, kcol);
+          DBG (
+              " BACKWARD row " << row
+              << " in update " << rowInUpdate
+              << " local pivot " << localPivot
+              << " inverse.get(row, row) " << Uinverse.get(row, kcol)
+              << " inverse.get(rowInUpdate, row) " << Uinverse.get(rowInUpdate, kcol)
+              << " result  " << updatedValue
+          );
+          Uinverse.set(rowInUpdate, kcol, updatedValue);
+        }
+    }
+  }
+  DBG (" printing inverse U-1: " );
+  DBG_CMD (Uinverse.print());
+
+  // Perform forward subtitution
+  SquareMatrix<T> Linverse(getSize());
+  Linverse.makeIdentity();
+  //   L   |  LInv
+  // 1 0 0 | 1 0 0      1 0 0 |  1  0   0
+  // l 1 0 | 0 1 0  ->  0 1 0 | l-1  1  0
+  // l l 1 | 0 0 1      0 0 1 | l-1 l-1 1
+  for ( unsigned int rowcol = 0; rowcol < getSize(); rowcol++ )
+  {
+    // Make zeros the colum of the rowcol-1 to rowcol=0
+    for ( unsigned int rowcolInUpdate = rowcol+1; rowcolInUpdate < getSize(); rowcolInUpdate++ )
+    {
+        DBG ( " in update " << rowcolInUpdate );
+        const T localPivot = -this->get(rowcolInUpdate, rowcol);
+        // Update all the columns at the left of the(rowcolInUpdate, rowcol) in both matrix
+        for ( unsigned int kcol=0; kcol<rowcolInUpdate; kcol++)
+        {
+          this->set(rowcolInUpdate, kcol, localPivot*this->get(rowcol, kcol)+this->get(rowcolInUpdate, kcol));
+          const auto updatedValue = localPivot*Linverse.get(rowcol, kcol)+Linverse.get(rowcolInUpdate, kcol);
+          DBG (
+             " FORWARD rowcol " << rowcol
+              << " in update " << rowcolInUpdate
+              << " local pivot " << localPivot
+              << " inverse.get(rowcol, rowcol) " << Linverse.get(rowcol, kcol)
+              << " inverse.get(rowcolInUpdate, rowcol) " << Linverse.get(rowcolInUpdate, kcol)
+              << " result  " << updatedValue
+          );
+          Linverse.set(rowcolInUpdate, kcol, updatedValue);
+        }
+    }
+  }
+  DBG (" printing inverse L-1: " );
+  DBG_CMD (Linverse.print());
+
+  // Get A-1 => Multiply A-1=U-1*L-1
+  SquareMatrix<T> Ainverse(getSize());
+  Ainverse.setZero();
+  for (unsigned int i=0; i<getSize(); i++)
+  {
+    for (unsigned int j=0; j<getSize(); j++)
+    {
+      T local = 0;
+      for (unsigned int k=0; k<getSize(); k++)
+      {
+        local += Uinverse.get(i, k) * Linverse.get(k, j);
+      }
+      Ainverse.set(i, j, local);
+    }
+  }
+
+  return Ainverse;
+}
+
+template <typename T>
+void SquareMatrix<T>::setData(T ptr, size_t size)
+{
+    if (size == this->_ncols * this->_nrows) {
+        memcpy(this->_matrix, ptr, size*size);
+    } else {
+        throw INVALID_RANGE;
+    }
 }
 
 #endif // SQUAREMATRIX
