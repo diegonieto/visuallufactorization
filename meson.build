@@ -5,6 +5,8 @@ project(
 
 projectName = 'visualLU'
 
+if (get_option('build-app'))
+
 qt5 = import('qt5')
 qt5_dep = dependency(
     'qt5',
@@ -27,6 +29,8 @@ executable(
     qtprocessed,
     dependencies : qt5_dep,
 )
+
+endif
 
 if (get_option('tests'))
     subdir('test')
