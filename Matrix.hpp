@@ -2,6 +2,7 @@
 #define MATRIX_H
 
 #include <iostream>
+#include <iomanip>
 
 enum Matrix_Errors {
     INVALID_RANGE = -20

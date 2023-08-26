@@ -1,0 +1,27 @@
+name: "build and check LU and Matrix inversion correctness"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  check-build-and-correctness:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Set up Meson
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build
+      - name: 'Checkout Code'
+        uses: actions/checkout@v3
+        with:
+          clean: 'false'
+      - name: 'Build repository'
+        run: |
+          mkdir -p subprojects
+          meson wrap install gtest
+          meson builddir -Dtests=true -Dbuild-app=false
+          ninja -C builddir
+          cd builddir
+          meson test
