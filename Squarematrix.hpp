@@ -276,7 +276,7 @@ SquareMatrix<T> SquareMatrix<T>::getInverse()
     }
     DBG (" printing A inversed and permuted: " );
     DBG_CMD (AinversePermuted.print());
-    Ainverse.setData(AinversePermuted.getDataPtr(), 9);
+    Ainverse.setData(AinversePermuted.getDataPtr(), getSize()*getSize());
   }
 
   return Ainverse;
