@@ -35,3 +35,5 @@ endif
 if (get_option('tests'))
     subdir('test')
 endif
+
+vlumatrix_dep = declare_dependency(include_directories : '.')
