@@ -17,7 +17,11 @@
 template <typename T>
 class SquareMatrix : public NumericMatrix<T> {
 public:
-    SquareMatrix(const int size) : NumericMatrix<T>(size, size) {}
+    SquareMatrix(const int size) :
+      NumericMatrix<T>(size, size)
+    {
+
+    }
     const unsigned int getSize() { return this->getRowsCount(); }
 
     /**
@@ -38,7 +42,7 @@ public:
      * @param ptr pointer to data
      * @param size size of the date. Must much cols*rows, i.e., size
      */
-    void setData(T ptr, size_t size);
+    void setData(T *ptr, size_t size);
 
 private:
     /**
@@ -52,6 +56,8 @@ private:
      * @brief Make the matrix identity by setting ones in the diagonal
      */
     void makeIdentity();
+
+    std::unique_ptr<SquareMatrix<T>> _permutationMatrix;
 };
 
 template <typename T>
@@ -77,6 +83,9 @@ void SquareMatrix<T>::permute(const unsigned int startRow)
       tmp = this->get(startRow, k);
       this->set(startRow, k, this->get(maxValueRow, k));
       this->set(maxValueRow, k, tmp);
+      tmp = _permutationMatrix->get(startRow, k);
+      _permutationMatrix->set(startRow, k, _permutationMatrix->get(maxValueRow, k));
+      _permutationMatrix->set(maxValueRow, k, tmp);
     }
   }
 }
@@ -97,6 +106,9 @@ void SquareMatrix<T>::makeIdentity()
 template <typename T>
 void SquareMatrix<T>::lu()
 {
+  _permutationMatrix = std::make_unique<SquareMatrix<T>>(getSize());
+  _permutationMatrix->makeIdentity();
+
   // Iterate through each column
   for ( unsigned int col=0; col<getSize()-1; col++ )
   {
@@ -199,9 +211,8 @@ SquareMatrix<T> SquareMatrix<T>::getInverse()
   DBG (" printing inverse L-1: " );
   DBG_CMD (Linverse.print());
 
-  // Get A-1 => Multiply A-1=U-1*L-1
+  // Get A-1 => Multiply A-1=U-1*L-1*p (only U-1*L-1 below)
   SquareMatrix<T> Ainverse(getSize());
-  Ainverse.setZero();
   for (unsigned int i=0; i<getSize(); i++)
   {
     for (unsigned int j=0; j<getSize(); j++)
@@ -214,15 +225,40 @@ SquareMatrix<T> SquareMatrix<T>::getInverse()
       Ainverse.set(i, j, local);
     }
   }
+  DBG (" printing inverse without permutation: " );
+  DBG_CMD (Ainverse.print());
+
+  // Get A-1 => Multiply A-1=(UL)-1 * p (the remaining multiplication)
+  SquareMatrix<T> AinversePermuted(getSize());
+  if (_permutationMatrix != nullptr)
+  {
+    DBG (" printing permutation matrix: " );
+    DBG_CMD (_permutationMatrix->print());
+    for (unsigned int i=0; i<getSize(); i++)
+    {
+      for (unsigned int j=0; j<getSize(); j++)
+      {
+        T local = 0;
+        for (unsigned int k=0; k<getSize(); k++)
+        {
+          local += Ainverse.get(i, k) * _permutationMatrix->get(k, j);
+        }
+        AinversePermuted.set(i, j, local);
+      }
+    }
+    DBG (" printing A inversed and permuted: " );
+    DBG_CMD (AinversePermuted.print());
+    Ainverse.setData(AinversePermuted.getDataPtr(), 9);
+  }
 
   return Ainverse;
 }
 
 template <typename T>
-void SquareMatrix<T>::setData(T ptr, size_t size)
+void SquareMatrix<T>::setData(T *ptr, size_t size)
 {
     if (size == this->_ncols * this->_nrows) {
-        memcpy(this->_matrix, ptr, size*size);
+        memcpy(this->_matrix, ptr, size*sizeof(T));
     } else {
         throw INVALID_RANGE;
     }

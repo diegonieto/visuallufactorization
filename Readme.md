@@ -10,11 +10,15 @@ on the following LA definitions:
 
 Having: $Ax = b$
 
-we want to obtain: $A^{-1}*Ax=A^{-1}b  =>  x=A^{-1}$
+we want to obtain: $A^{-1}*Ax=A^{-1}b  =>  x=A^{-1}b$
 
-By factorizing A we have: $A = LU => A^{-1} = U^{-1}L^{-1}$
+By factorizing A we have: $A = LU$ where U and L are the upper and lower matrix correspondingly.
 
-So, we first factorize and then invert L and U. Multiplying the result we obtaing the inverted matrix
+If we use a permutation matrix then we have $pA = LU => A = p^{-1}LU$
+
+So, we first factorize and then invert L and U. Multiplying the result we obtaing the inverted matrix:
+
+$A^{-1} = U^{-1}L^{-1}*p$
 
 # Building
 ```
