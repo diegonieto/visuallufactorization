@@ -28,10 +28,11 @@ public:
     }
 
     virtual T get(const unsigned int i, const unsigned int j) const;
+    virtual T* getDataPtr() const;
     virtual bool set(const unsigned int i, const unsigned int j, const T value);
-    virtual const unsigned int getRowsCount();
-    virtual const unsigned int getColumnsCount();
-    void print();
+    virtual const unsigned int getRowsCount() const;
+    virtual const unsigned int getColumnsCount() const;
+    void print() const;
 };
 
 template <typename T>
@@ -41,6 +42,12 @@ T Matrix<T>::get(const unsigned int i, const unsigned int j) const
         return _matrix[i*_ncols+j];
     else
         throw INVALID_RANGE;
+}
+
+template <typename T>
+T* Matrix<T>::getDataPtr() const
+{
+    return _matrix;
 }
 
 template <typename T>
@@ -54,19 +61,19 @@ bool Matrix<T>::set(const unsigned int i, const unsigned int j, const T value)
 }
 
 template <typename T>
-const unsigned int Matrix<T>::getRowsCount()
+const unsigned int Matrix<T>::getRowsCount() const
 {
     return _nrows;
 }
 
 template <typename T>
-const unsigned int Matrix<T>::getColumnsCount()
+const unsigned int Matrix<T>::getColumnsCount() const
 {
     return _ncols;
 }
 
 template <typename T>
-void Matrix<T>::print()
+void Matrix<T>::print() const
 {
     for (unsigned int i = 0; i < _nrows; i++)
     {

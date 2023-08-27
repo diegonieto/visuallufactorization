@@ -174,7 +174,7 @@ TEST(NumericMatrix, InverseLower1)
   EXPECT_NEAR(1, inverse.get(2, 2), 0.00001);
 }
 
-TEST(NumericMatrix, InverseA)
+TEST(NumericMatrix, InverseA1)
 {
   const size_t matrixSize = 3;
   std::unique_ptr<SquareMatrix<NumericType>> matrix = std::make_unique<SquareMatrix<NumericType>>(matrixSize);
@@ -192,15 +192,48 @@ TEST(NumericMatrix, InverseA)
 
   auto inverse = matrix->getInverse();
 
-  EXPECT_NEAR(0.13542, inverse.get(0, 0), 0.00001);
+  EXPECT_NEAR(-0.06250, inverse.get(0, 0), 0.00001);
   EXPECT_NEAR(0.10417, inverse.get(0, 1), 0.00001);
-  EXPECT_NEAR(-0.06250, inverse.get(0, 2), 0.00001);
-  EXPECT_NEAR(-0.08333, inverse.get(1, 0), 0.00001);
-  EXPECT_NEAR(0.166667, inverse.get(1, 1), 0.00001);
-  EXPECT_NEAR(0, inverse.get(1, 2), 0.00001);
-  EXPECT_NEAR(0.01042, inverse.get(2, 0), 0.00001);
+  EXPECT_NEAR(0.13542, inverse.get(0, 2), 0.00001);
+  EXPECT_NEAR(-0.00000, inverse.get(1, 0), 0.00001);
+  EXPECT_NEAR(0.16667, inverse.get(1, 1), 0.00001);
+  EXPECT_NEAR(-0.08333, inverse.get(1, 2), 0.00001);
+  EXPECT_NEAR(0.18750, inverse.get(2, 0), 0.00001);
   EXPECT_NEAR(-0.14583, inverse.get(2, 1), 0.00001);
-  EXPECT_NEAR(0.18750, inverse.get(2, 2), 0.00001);
+  EXPECT_NEAR(0.01042, inverse.get(2, 2), 0.00001);
+}
+
+TEST(NumericMatrix, InverseA2)
+{
+  const size_t matrixSize = 3;
+  std::unique_ptr<SquareMatrix<NumericType>> matrix = std::make_unique<SquareMatrix<NumericType>>(matrixSize);
+
+  NumericType A[] = {
+    1, 2, 2,
+    4, 4, 2,
+    4, 6, 4
+  };
+
+  matrix->setData(A, 9);
+
+  matrix->print();
+  matrix->lu();
+  matrix->print();
+  auto inverse = matrix->getInverse();
+  EXPECT_NEAR(1, inverse.getDataPtr()[0], 0.00001);
+
+  inverse.print();
+
+  EXPECT_EQ(1, inverse.get(0, 0));
+  EXPECT_EQ(1, inverse.get(0, 1));
+  EXPECT_EQ(-1, inverse.get(0, 2));
+  EXPECT_EQ(-2, inverse.get(1, 0));
+  EXPECT_EQ(-1, inverse.get(1, 1));
+  EXPECT_EQ(1.5, inverse.get(1, 2));
+  EXPECT_EQ(2, inverse.get(2, 0));
+  EXPECT_EQ(0.5, inverse.get(2, 1));
+  EXPECT_EQ(-1, inverse.get(2, 2));
+
 }
 
 int main(int argc, char *argv[])
