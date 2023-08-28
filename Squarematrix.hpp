@@ -30,8 +30,12 @@
 #define SQUAREMATRIX
 
 #include <cmath>
-#include "NumericMatrix.hpp"
 #include <array>
+
+#include <string.h>
+
+#include "NumericMatrix.hpp"
+
 
 // #define DEBUG
 #ifdef DEBUG
